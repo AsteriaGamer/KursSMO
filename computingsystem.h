@@ -10,6 +10,7 @@ class ComputingSystem
 {
 
 public:
+
     ComputingSystem();
     static double GetExpProbability(double,double);
     static double GetRandomNumber(double, double);
@@ -19,9 +20,13 @@ signals:
 public slots:
 
 private:
-    int bufferItems = 0;
     std::list<ServerProgramm> programms;
     std::list<ServerProgramm> finishedProgramms;
+    
+    double timeTillNextProgrammLinear = 0;
+    auto popupProbabilityExp = GetExpProbability(Constants::ProgrammPopupTime::ExpLambda, Constants::SimulationStep);
+    double elapsedExp = 0;
+
 };
 
 #endif // COMPUTINGSYSTEM_H

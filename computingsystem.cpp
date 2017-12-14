@@ -17,10 +17,6 @@ ComputingSystem::Simulate(DistributionType distributionType = Liniar){
 
     ComputingSystemStatistics statistic = new ComputingSystemStatistics();
 
-    double timeTillNextProgrammLinear = 0;
-    auto popupProbabilityExp = GetExpProbability(Constants::ProgrammPopupTime::ExpLambda, Constants::SimulationStep);
-    double elapsedExp = 0;
-
     for (double i = 0; i <= Constants::SimulationTime; i += Constants::SimulationStep){
 
         std::for_each(programms.begin(), programms.end(), [](ServerProgramm s) {s.Update(Constants::SimulationStep);});
