@@ -27,7 +27,7 @@ public:
     int TotalProgrammsAdded = 0;
 
     void AnalizeSnapShots();
-    static double CountProbability(int, int);
+    double CountProbability(int, int);
 
 };
 

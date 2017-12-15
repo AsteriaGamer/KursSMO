@@ -1,6 +1,7 @@
 #ifndef SERVERPROGRAMM_H
 #define SERVERPROGRAMM_H
 
+
 enum DistributionType
 {
     Liniar, Exponential
@@ -27,9 +28,6 @@ public:
 private:
     bool isExponential;
     double expAverage;
-signals:
-
-public slots:
 };
 
 #endif // SERVERPROGRAMM_H

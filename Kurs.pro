@@ -27,17 +27,17 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     computingsystem.cpp \
-    serverprogramm.cpp \
     constants.cpp \
-    computingsystemstatistics.cpp
+    computingsystemstatistics.cpp \
+    serverprogramm.cpp
 
 HEADERS += \
         mainwindow.h \
     computingsystem.h \
-    serverprogramm.h \
     constants.h \
     computingsystemstatistics.h \
-    cpplinq.hpp
+    cpplinq.hpp \
+    serverprogramm.h
 
 FORMS += \
         mainwindow.ui

@@ -15,11 +15,6 @@ public:
     static double GetExpProbability(double,double);
     static double GetRandomNumber(double, double);
     ComputingSystemStatistics Simulate(DistributionType);
-
-signals:
-
-public slots:
-
 private:
     std::list<ServerProgramm> programms;
     std::list<ServerProgramm> finishedProgramms;
