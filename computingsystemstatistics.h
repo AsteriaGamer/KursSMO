@@ -9,6 +9,7 @@
 
 class SnapShot
     {
+public:
         int ExecutingCount = 0;
         int BufferItemsCount = 0;
     };

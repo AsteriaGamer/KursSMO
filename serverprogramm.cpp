@@ -31,3 +31,14 @@ void ServerProgramm::Update(double timePassed){
         }
     }
 }
+
+//bool ServerProgramm::operator ==(ProgrammStatus& ProgrammStatus){
+//    if (this->Status==ProgrammStatus)
+//        return true;
+//    return false;
+//}
+
+//bool ServerProgramm::operator==(ServerProgramm& left, ServerProgramm& right )
+//{
+//    return static_cast< ServerProgramm >( left ) == static_cast< ServerProgramm >( right );
+//}

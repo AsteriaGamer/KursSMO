@@ -1,8 +1,6 @@
 #ifndef SERVERPROGRAMM_H
 #define SERVERPROGRAMM_H
 
-#include <QObject>
-
 enum DistributionType
 {
     Liniar, Exponential
@@ -22,6 +20,10 @@ public:
     double ExecutionTime;
     double ExecutionAwaitingTime = 0;
     void Update(double);
+    inline bool operator==(const ServerProgramm &rhs) const {
+        if(rhs.Status == ProgrammStatus::Executing)
+            return true;
+    }
 private:
     bool isExponential;
     double expAverage;

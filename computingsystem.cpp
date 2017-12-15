@@ -3,19 +3,19 @@
 #include "constants.h"
 #include "math.h"
 #include <algorithm>
-#include "cpplinq.hpp"
-
-using namespace cpplinq;
 
 ComputingSystem::ComputingSystem()
 {
 
 }
 
-ComputingSystem::Simulate(DistributionType distributionType = Liniar){
+ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributionType = Liniar){
 
 
-    ComputingSystemStatistics statistic = new ComputingSystemStatistics();
+    ComputingSystemStatistics *statistic = new ComputingSystemStatistics();
+
+    double timeTillNextProgrammLinear = 0;
+    auto popupProbabilityExp = GetExpProbability(Constants::ProgrammPopupTime::ExpLambda, Constants::SimulationStep);
 
     for (double i = 0; i <= Constants::SimulationTime; i += Constants::SimulationStep){
 
@@ -23,87 +23,94 @@ ComputingSystem::Simulate(DistributionType distributionType = Liniar){
 
         if(distributionType == Liniar){
             if(timeTillNextProgrammLinear <= 0){
-                ServerProgramm serverProgramm = new ServerProgramm(Liniar, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
-                programms.push_back(serverProgramm);
+                ServerProgramm *serverProgramm = new ServerProgramm(Liniar, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+                programms.push_back(*serverProgramm);
                 timeTillNextProgrammLinear = GetRandomNumber(Constants::ProgrammPopupTime::LinearMinTime, Constants::ProgrammPopupTime::LinearMaxTime);
-                statistic::TotalProgrammsAdded++;
+                statistic->TotalProgrammsAdded++;
             }
             timeTillNextProgrammLinear -= Constants::SimulationStep;
         }else if(distributionType == Exponential){
             if(popupProbabilityExp > GetRandomNumber(0,1)){
-                ServerProgramm serverProgramm = new ServerProgramm(Exponential, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
-                programms.push_back(serverProgramm);
-                statistic::TotalProgrammsAdded++;
+                ServerProgramm *serverProgramm = new ServerProgramm(Exponential, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+                programms.push_back(*serverProgramm);
+                statistic->TotalProgrammsAdded++;
             }
         }
 
 
+        // Перевод программ из ожидания в удаление.
+        int countOfAwaiting = 0;
 
-        auto countOfAwaiting = from(programms)
-                >> where([](ServerProgramm s) {return s.Status == ServerProgramm::ProgrammStatus::AwaitingExecution;})
-                >> count();
+        for (auto it = begin(programms); it != end(programms); ++it) {
+            if(it->Status == Executing)
+                countOfAwaiting++;
+        }
+
         int freeServersCount = Constants::ServersCount - countOfAwaiting;
 
-        for (std::list<programms>::iterator it=programms.begin(); it != programms.end(); ++it){
-            if(it->Status == ServerProgramm::ProgrammStatus::AwaitingExecution){
-                it->Status = ServerProgramm::ProgrammStatus::Execution;
-            }
+        for(int i = 0; i <= freeServersCount; i++){
+             auto it = programms.begin();
+             std::advance(it, i);
+             if(it->Status == AwaitingExecution)
+                 it->Status = Executing;
         }
 
+        // Переполняющие буфер программы считаются не выполненными
+        int countOverFlow = 0;
 
+        for (auto it = begin(programms); it != end(programms); ++it) {
+            if(it->Status == AwaitingExecution)
+                countOverFlow++;
+        }
 
-//        from(programms)
-//                >> where([](ServerProgramm s) {return s.Status == ServerProgramm::ProgrammStatus::AwaitingExecution;})
-//                >> take(freeServersCount)
-//                >> to_list();
-
-        auto countOverFlow = from(programms)
-                >> where([](ServerProgramm s) {return s.Status == ServerProgramm::ProgrammStatus::AwaitingExecution;})
-                >> count();
-        auto overflowCount = countOverFlow - Constants::BufferSize;
+        int overflowCount = countOverFlow - Constants::BufferSize;
         if (overflowCount > 0){
-            for (std::list<programms>::iterator it=programms.begin(); it != programms.end(); ++it){
-                if(*it.Status == ServerProgramm::ProgrammStatus::AwaitingExecution){
-                    *it.Status = ServerProgramm::ProgrammStatus::Discarded;
-                }
+            for(int i = 0; i <= countOverFlow; i++){
+                 auto it = programms.begin();
+                 std::advance(it, i);
+                 if(it->Status == AwaitingExecution)
+                     it->Status = Discarded;
             }
-
-
-            programms.Where(x => x.Status == ServerProgramm.ProgrammStatus.AwaitingExecution).Take(overflowCount).ToList()
-            .ForEach(x => x.Status = ServerProgramm.ProgrammStatus.Discarded);
         }
+
 
         //сбор статистики
-        statistic.SnapShots.push_back(new SnapShot()
-        {
-            BufferItemsCount = from(programms)
-                                    >> where([](ServerProgramm s) {return s.Status == ServerProgramm::ProgrammStatus::AwaitingExecution;})
-                                    >> count();
-            ExecutingCount =from(programms)
-                                    >> where([](ServerProgramm s) {return s.Status == ServerProgramm::ProgrammStatus::Execution;})
-                                    >> count();
-        });
+        SnapShot SnapObj;
 
-        //удаляем из листа программ не обработанные и выполненные программы для оптимизации скорости поиска по листу в следующих итерациях           
-        for (std::list<programms>::iterator it=programms.begin(); it != programms.end(); ++it){
-            if (it->Status == ServerProgramm.ProgrammStatus.Executed) {
-                    statistic.ExecutedProgrammsCount++;
-                    it = programms.erase(it);
+        for(auto it: programms){
+            if (it.Status == AwaitingExecution) {
+                    SnapObj.BufferItemsCount++;
+                } else if(it.Status == Executing){
+                    SnapObj.ExecutingCount++;
+                }
+        }
+
+        statistic->SnapShots.push_back(SnapObj);
+
+        //удаляем из листа программ не обработанные и выполненные программы для оптимизации скорости поиска по листу в следующих итерациях
+        for(auto it: programms){
+            if (it.Status == Executed) {
+                    statistic->ExecutedProgrammsCount++;
+                    programms.remove(it);
                     finishedProgramms.push_back(it);
-                } else if(it->Status == ServerProgramm.ProgrammStatus.Discarded){
-                    statistic.DiscardedProgrammsCount++;
-                    it = programms.erase(it);
+                } else if(it.Status == Discarded){
+                    statistic->DiscardedProgrammsCount++;
+                    programms.remove(it);
                     finishedProgramms.push_back(it);
                 }
         }
 
-    }
 
+    //finishedProgramms.push_back(programms);
 
-    finishedProgramms.AddRange(programms);
-    statistic.programms = finishedProgramms;
-    return statistic;
+    std::copy(programms.begin(), programms.end(), std::back_insert_iterator<std::list<ServerProgramm> >(finishedProgramms));
+
+    statistic->programms = finishedProgramms;
+    return *statistic;
+
+ }
 }
+
 
 double ComputingSystem::GetExpProbability(double lambda, double time){
     return lambda < 0 ? 0 :
