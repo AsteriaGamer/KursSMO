@@ -36,7 +36,6 @@ HEADERS += \
     computingsystem.h \
     constants.h \
     computingsystemstatistics.h \
-    cpplinq.hpp \
     serverprogramm.h
 
 FORMS += \
