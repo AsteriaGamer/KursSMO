@@ -1,8 +1,10 @@
 #include "computingsystem.h"
 #include "serverprogramm.h"
 #include "constants.h"
-#include "math.h"
+#include <cmath>
 #include <algorithm>
+#include <ctime>
+#include <QDebug>
 
 ComputingSystem::ComputingSystem()
 {
@@ -12,28 +14,36 @@ ComputingSystem::ComputingSystem()
 ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributionType = Liniar){
 
 
-    ComputingSystemStatistics *statistic = new ComputingSystemStatistics();
+    ComputingSystemStatistics statistic;
+	std::list<ServerProgramm> programms;
+	std::list<ServerProgramm> finishedProgramms;
 
     double timeTillNextProgrammLinear = 0;
     auto popupProbabilityExp = GetExpProbability(Constants::ProgrammPopupTime::ExpLambda, Constants::SimulationStep);
 
     for (double i = 0; i <= Constants::SimulationTime; i += Constants::SimulationStep){
 
-        std::for_each(programms.begin(), programms.end(), [](ServerProgramm s) {s.Update(Constants::SimulationStep);});
+		for (auto it = begin(programms); it != end(programms); ++it) {
+			it->Update(Constants::SimulationStep);
+		}
 
         if(distributionType == Liniar){
             if(timeTillNextProgrammLinear <= 0){
-                ServerProgramm *serverProgramm = new ServerProgramm(Liniar, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
-                programms.push_back(*serverProgramm);
+                //ServerProgramm *serverProgramm = new ServerProgramm(Liniar, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+                //programms.push_back(*serverProgramm);
+				ServerProgramm serverProgramm(Liniar, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+				programms.push_back(serverProgramm);
                 timeTillNextProgrammLinear = GetRandomNumber(Constants::ProgrammPopupTime::LinearMinTime, Constants::ProgrammPopupTime::LinearMaxTime);
-                statistic->TotalProgrammsAdded++;
+                statistic.TotalProgrammsAdded++;
             }
             timeTillNextProgrammLinear -= Constants::SimulationStep;
         }else if(distributionType == Exponential){
             if(popupProbabilityExp > GetRandomNumber(0,1)){
-                ServerProgramm *serverProgramm = new ServerProgramm(Exponential, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
-                programms.push_back(*serverProgramm);
-                statistic->TotalProgrammsAdded++;
+                //ServerProgramm *serverProgramm = new ServerProgramm(Exponential, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+                //programms.push_back(*serverProgramm);
+				ServerProgramm serverProgramm(Exponential, GetRandomNumber(Constants::ProgrammExecutionTime::LinearMinTime, Constants::ProgrammExecutionTime::LinearMaxTime));
+				programms.push_back(serverProgramm);
+                statistic.TotalProgrammsAdded++;
             }
         }
 
@@ -48,8 +58,9 @@ ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributio
 
         int freeServersCount = Constants::ServersCount - countOfAwaiting;
 
+
+		auto it = programms.begin();
         for(int i = 0; i <= freeServersCount; i++){
-             auto it = programms.begin();
              std::advance(it, i);
              if(it->Status == AwaitingExecution)
                  it->Status = Executing;
@@ -65,8 +76,8 @@ ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributio
 
         int overflowCount = countOverFlow - Constants::BufferSize;
         if (overflowCount > 0){
+			auto it = programms.begin();
             for(int i = 0; i <= countOverFlow; i++){
-                 auto it = programms.begin();
                  std::advance(it, i);
                  if(it->Status == AwaitingExecution)
                      it->Status = Discarded;
@@ -85,29 +96,27 @@ ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributio
                 }
         }
 
-        statistic->SnapShots.push_back(SnapObj);
+        statistic.SnapShots.push_back(SnapObj);
 
         //удаляем из листа программ не обработанные и выполненные программы для оптимизации скорости поиска по листу в следующих итерациях
         for(auto it: programms){
             if (it.Status == Executed) {
-                    statistic->ExecutedProgrammsCount++;
+                    statistic.ExecutedProgrammsCount++;
                     programms.remove(it);
                     finishedProgramms.push_back(it);
                 } else if(it.Status == Discarded){
-                    statistic->DiscardedProgrammsCount++;
+                    statistic.DiscardedProgrammsCount++;
                     programms.remove(it);
                     finishedProgramms.push_back(it);
                 }
         }
 
-
-    //finishedProgramms.push_back(programms);
-
-    std::copy(programms.begin(), programms.end(), std::back_insert_iterator<std::list<ServerProgramm> >(finishedProgramms));
-
-    statistic->programms = finishedProgramms;
-    return *statistic;
-
+    //std::copy(programms.begin(), programms.end(), std::back_insert_iterator<std::list<ServerProgramm> >(finishedProgramms));
+	finishedProgramms.insert(finishedProgramms.end(), programms.begin(), programms.end());
+	statistic.programms.insert(programms.end(), finishedProgramms.begin(), finishedProgramms.end());
+	//std::copy(finishedProgramms.begin(), finishedProgramms.end(), std::back_insert_iterator<std::list<ServerProgramm> >(statistic.programms));
+    //statistic->programms = finishedProgramms;
+    return statistic;
  }
 }
 
