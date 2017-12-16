@@ -22,8 +22,16 @@ public:
     double ExecutionAwaitingTime = 0;
     void Update(double);
     inline bool operator==(const ServerProgramm &rhs) const {
-        if(rhs.Status == ProgrammStatus::Executing)
+        if(rhs.Status == ProgrammStatus::AwaitingExecution)
             return true;
+        else if(rhs.Status == ProgrammStatus::Executing)
+            return true;
+        else if(rhs.Status == ProgrammStatus::Executed)
+            return true;
+        else if(rhs.Status == ProgrammStatus::Discarded)
+            return true;
+        else
+            return false;
     }
 private:
     bool isExponential;

@@ -6,8 +6,8 @@ ComputingSystemStatistics::ComputingSystemStatistics()
 }
 
 void ComputingSystemStatistics::AnalizeSnapShots(){
-//    std::map<int, int> programmsStepsDictionary;
-//                //for (int i = 0; i < SnapShots.size(); ++i)
+    std::map<int, int> programmsStepsDictionary;
+                //for (int i = 0; i < SnapShots.size(); ++i)
 //                for (auto it = begin(SnapShots); it != end(SnapShots); ++it)
 //                {
 //                    int programmsInSystem = it->ExecutingCount + it->BufferItemsCount;
@@ -17,10 +17,10 @@ void ComputingSystemStatistics::AnalizeSnapShots(){
 //                    programmsStepsDictionary[programmsInSystem]++;
 //                }
 
-//                for (auto kv : programmsStepsDictionary) {
-//                    ProgrammsCountProbability.insert(std::pair<int,double>(kv.first, CountProbability(kv.second, SnapShots.size())));
+                for (auto kv : programmsStepsDictionary) {
+                    ProgrammsCountProbability.insert(std::pair<int,double>(kv.first, CountProbability(kv.second, SnapShots.size())));
 
-//                }
+                }
 
 }
 
