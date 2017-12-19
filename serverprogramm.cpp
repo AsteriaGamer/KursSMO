@@ -2,6 +2,11 @@
 #include "computingsystem.h"
 #include "constants.h"
 
+ServerProgramm::~ServerProgramm(){
+
+}
+
+
 ServerProgramm::ServerProgramm(DistributionType distrType, double time){
     if(distrType == Liniar){
         ExecutionTime = ExecutionTimeLeft = time;

@@ -7,17 +7,17 @@ ComputingSystemStatistics::ComputingSystemStatistics()
 
 void ComputingSystemStatistics::AnalizeSnapShots(){
     std::map<int, int> programmsStepsDictionary;
-              for (auto it: SnapShots)
-               {
-                  int programmsInSystem = (it.ExecutingCount + it.BufferItemsCount);
+                for (auto it: SnapShots)
+                {
+                    int programmsInSystem = (it.ExecutingCount + it.BufferItemsCount);
                     if (programmsStepsDictionary.count(programmsInSystem) == 0)
-						programmsStepsDictionary.insert({ programmsInSystem, 0 });
+                        programmsStepsDictionary[programmsInSystem] = 0;
 
                     programmsStepsDictionary[programmsInSystem]++;
                 }
 
                 for (auto kv : programmsStepsDictionary) {
-					ProgrammsCountProbability.insert({ kv.first, CountProbability(kv.second, SnapShots.size()) });
+                    ProgrammsCountProbability[kv.first] = CountProbability(kv.second, SnapShots.count());
 
                 }
 

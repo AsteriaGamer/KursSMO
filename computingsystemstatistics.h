@@ -4,8 +4,8 @@
 #include <list>
 #include "serverprogramm.h"
 #include <map>
-#include <list>
 #include <cmath>
+#include <QList>
 
 class SnapShot
     {
@@ -18,8 +18,8 @@ class ComputingSystemStatistics
 {
 public:
     ComputingSystemStatistics();
-    std::list<SnapShot> SnapShots;
-    std::list<ServerProgramm> programms;
+    QList<SnapShot> SnapShots;
+    QList<ServerProgramm> programms;
     std::map<int, double> ProgrammsCountProbability;
 
     int ExecutedProgrammsCount = 0;

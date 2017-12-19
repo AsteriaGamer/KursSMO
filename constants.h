@@ -13,10 +13,10 @@ public:
 
     class ProgrammPopupTime{
     public:
-        static constexpr double LinearMinTime = 1.0/2.0;
-        static constexpr double LinearMaxTime = 5.0/6.0;
+        static constexpr double LinearMinTime = 0.5;
+        static constexpr double LinearMaxTime = 0.83;
 
-        static constexpr double ExpLambda = 1;
+        static constexpr double ExpLambda = 1.5;
     };
 
     class ProgrammExecutionTime{
