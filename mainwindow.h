@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -14,12 +15,11 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-private slots:
+public slots:
 	void RunAndShow();
-
+    void UpdateS(QString, QString);
 private:
     Ui::MainWindow *ui;
-	double countPercents(double, double);
 };
 
 #endif // MAINWINDOW_H

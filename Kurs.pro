@@ -35,14 +35,16 @@ SOURCES += \
     computingsystem.cpp \
     constants.cpp \
     computingsystemstatistics.cpp \
-    serverprogramm.cpp
+    serverprogramm.cpp \
+    outthread.cpp
 
 HEADERS += \
         mainwindow.h \
     computingsystem.h \
     constants.h \
     computingsystemstatistics.h \
-    serverprogramm.h
+    serverprogramm.h \
+    outthread.h
 
 FORMS += \
         mainwindow.ui
