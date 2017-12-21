@@ -1,8 +1,6 @@
 #ifndef SERVERPROGRAMM_H
 #define SERVERPROGRAMM_H
 
-#include "list"
-
 enum DistributionType
 {
     Liniar, Exponential
@@ -22,7 +20,6 @@ public:
     double ExecutionTimeLeft;
     double ExecutionTime;
     double ExecutionAwaitingTime = 0;
-    void Update(double);
     inline bool operator==(const ServerProgramm &rhs) const {
         if(rhs.Status == AwaitingExecution)
             return true;
@@ -37,9 +34,6 @@ public:
     }
     bool isExponential;
     double expAverage;
-//private:
-//    bool isExponential;
-//    double expAverage;
 };
 
 #endif // SERVERPROGRAMM_H

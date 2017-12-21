@@ -17,22 +17,3 @@ ServerProgramm::ServerProgramm(DistributionType distrType, double time){
         isExponential = true;
     }
 }
-
-void ServerProgramm::Update(double timePassed){
-    if(Status == AwaitingExecution)
-        ExecutionAwaitingTime += timePassed;
-    else if(Status == Executing){
-        if(isExponential){
-            ExecutionTime += timePassed;
-
-            double probabilityOfBeingExecuted = ComputingSystem::GetExpProbability(Constants::ProgrammExecutionTime::ExpAvgExecutionTime, Constants::SimulationStep);
-
-            if(probabilityOfBeingExecuted > ComputingSystem::GetRandomNumber(0,1))
-                Status = Executed;
-        }else{
-            ExecutionTimeLeft -= timePassed;
-            if(ExecutionTimeLeft <= 0)
-                Status = Executed;
-        }
-    }
-}

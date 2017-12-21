@@ -42,8 +42,7 @@ HEADERS += \
     computingsystem.h \
     constants.h \
     computingsystemstatistics.h \
-    serverprogramm.h \
-    cpplinq.hpp
+    serverprogramm.h
 
 FORMS += \
         mainwindow.ui
