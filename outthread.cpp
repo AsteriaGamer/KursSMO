@@ -11,15 +11,15 @@ OutThread::OutThread(int DistTypeA, QString tempRunsA, QString SCA, QString BSA,
 {
     DistType = DistTypeA;
     tempRuns = tempRunsA.toInt();
-    SC = SCA;
-    BS = BSA;
-    ST = STA;
-    LPMinT = LPMinTA;
-    LPMaxT = LPMaxTA;
-    EL = ELA;
-    LEMinT = LEMinTA;
-    LEMaxT = LEMaxTA;
-    EAET = EAETA;
+    SC = SCA.toInt();
+    BS = BSA.toInt();
+    ST = STA.toInt();
+    LPMinT = LPMinTA.toDouble();
+    LPMaxT = LPMaxTA.toDouble();
+    EL = ELA.toDouble();
+    LEMinT = LEMinTA.toDouble();
+    LEMaxT = LEMaxTA.toDouble();
+    EAET = EAETA.toDouble();
 }
 
 void OutThread::doWork(){
@@ -126,7 +126,7 @@ void OutThread::doWork(){
         {
             emit send(QString::number(it.second/tempRuns)," - вероятность того, что ВС не загружена");
         }
-        else if (it.first < SC.toInt())
+        else if (it.first < SC)
         {
             QString test = " - вероятность того, что загружено: ";
             test += QString::number(it.first);
@@ -135,7 +135,7 @@ void OutThread::doWork(){
             test += " серверов. Буфер свободен.";
             emit send(QString::number(it.second/tempRuns), test);
         }
-        else if (it.first == SC.toInt())
+        else if (it.first == SC)
         {
             QString test2 = " - вероятность того, что загружено:  ";
             test2 += SC;
@@ -144,9 +144,9 @@ void OutThread::doWork(){
             test2 += " серверов. Буфер свободен.";
             emit send(QString::number(it.second/tempRuns),test2);
         }
-        else if (it.first > SC.toInt())
+        else if (it.first > SC)
         {
-            int inBufferCount = it.first - SC.toInt();
+            int inBufferCount = it.first - SC;
             QString test3 = " - вероятность того, что в буфере ";
             test3 += QString::number(inBufferCount);
             test3 += " программа(ы)";

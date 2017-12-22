@@ -6,7 +6,7 @@
 class Constants
 {
 public:
-    Constants(QString, QString, QString, QString, QString, QString, QString, QString, QString);
+    Constants(int, int, int, double, double, double, double, double, double);
     int ServersCount;
     int BufferSize;
     int SimulationTime;

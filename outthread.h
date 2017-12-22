@@ -13,15 +13,15 @@ public:
     double countPercents(double, double);
     int DistType = 0;
     int tempRuns;
-    QString SC;
-    QString BS;
-    QString ST;
-    QString LPMinT;
-    QString LPMaxT;
-    QString EL;
-    QString LEMinT;
-    QString LEMaxT;
-    QString EAET;
+    int SC;
+    int BS;
+    int ST;
+    double LPMinT;
+    double LPMaxT;
+    double EL;
+    double LEMinT;
+    double LEMaxT;
+    double EAET;
 public slots:
     void doWork();
 signals:
