@@ -5,6 +5,7 @@
 #include <QString>
 #include <map>
 #include "mainwindow.h"
+#include <QTime>
 
 OutThread::OutThread(int DistTypeA, QString tempRunsA, QString SCA, QString BSA, QString STA, QString LPMinTA,
                      QString LPMaxTA, QString ELA, QString LEMinTA, QString LEMaxTA, QString EAETA)
@@ -23,8 +24,6 @@ OutThread::OutThread(int DistTypeA, QString tempRunsA, QString SCA, QString BSA,
 }
 
 void OutThread::doWork(){
-    //int runsNum = tempRuns.toInt();
-
     std::map<int, double> tempDict;
     auto tempExecutedPercent = 0.0;
     auto tempProgrammsExecutedPerSecond = 0.0;
@@ -35,25 +34,39 @@ void OutThread::doWork(){
     auto tempAvgProgrammsInBuffer = 0.0;
     auto tempAverageTimeInBuffer = 0.0;
 
+    int barStatus = 0;
+
+    QTime currTime = QTime::currentTime();
+
     Constants ConstObj(SC,BS,ST,
                        LPMinT,LPMaxT,EL,
                        LEMinT,LEMaxT,EAET);
 
     DistributionType type = Exponential;
+    QString typeDistName = "";
 
     auto test = DistType;
     if (test == 0){
         type = Exponential;
-    }else if (test == 1)
+        typeDistName = "Экспоненциальное";
+    }else if (test == 1){
+        typeDistName = "Линейное";
         type = Liniar;
+    }
 
     for(int i = 0; i < tempRuns; i++){
+
+        barStatus += 25/tempRuns;
+        emit sendBarStatus(barStatus);
 
         ComputingSystem cs;
 
         auto stats = cs.Simulate(type, ConstObj);
 
         stats.AnalizeSnapShots();
+
+        barStatus += 25/tempRuns;
+        emit sendBarStatus(barStatus);
 
         for(auto it: stats.ProgrammsCountProbability)
         {
@@ -77,7 +90,8 @@ void OutThread::doWork(){
                 tempDict[it.first] += it.second;
             }
         }
-
+        barStatus += 25/tempRuns;
+        emit sendBarStatus(barStatus);
         double executedPercentage = countPercents(stats.TotalProgrammsAdded, stats.ExecutedProgrammsCount);
         tempExecutedPercent += executedPercentage;
         double programmsExecutedPerSecond = (double)stats.ExecutedProgrammsCount / (double)ConstObj.SimulationTime;
@@ -103,6 +117,9 @@ void OutThread::doWork(){
         double avgProgrammsInSystem = (double)totalProgrammsInSystem / (double)stats.SnapShots.count();
         tempAvgProgrammsInSystem += avgProgrammsInSystem;
 
+        barStatus += 25/tempRuns;
+        emit sendBarStatus(barStatus);
+
         double spentTimeTotal = 0.0;
         double spentTimeInBuffer = 0.0;
         for(auto programm: stats.programms){
@@ -118,7 +135,12 @@ void OutThread::doWork(){
         double averageTimeInBuffer = spentTimeInBuffer / (double)stats.programms.count();
         tempAverageTimeInBuffer += averageTimeInBuffer;
 
+        barStatus += 25/tempRuns;
+        emit sendBarStatus(barStatus);
     }
+
+    emit send("Время начала обработки задачи : ", currTime.toString("hh:mm:ss"));
+    emit send("Тип распределения: ", typeDistName);
 
     for(auto it: tempDict)
     {
@@ -131,16 +153,16 @@ void OutThread::doWork(){
             QString test = " - вероятность того, что загружено: ";
             test += QString::number(it.first);
             test += "/";
-            test += SC;
+            test += QString::number(SC);
             test += " серверов. Буфер свободен.";
             emit send(QString::number(it.second/tempRuns), test);
         }
         else if (it.first == SC)
         {
             QString test2 = " - вероятность того, что загружено:  ";
-            test2 += SC;
+            test2 += QString::number(SC);
             test2 += "/";
-            test2 += SC;
+            test2 += QString::number(SC);;
             test2 += " серверов. Буфер свободен.";
             emit send(QString::number(it.second/tempRuns),test2);
         }
@@ -155,13 +177,18 @@ void OutThread::doWork(){
     }
     emit send(QString::number(tempExecutedPercent/tempRuns, 2.0, 2), " - Q (относит. пропускная способность- процент программ, обработанных ВС) ");
     emit send(QString::number(tempProgrammsExecutedPerSecond/tempRuns, 2.0, 2), " - S (среднее число программ, обработанных в секунду)");
-    emit send(QString::number(tempDiscardProbability/tempRuns, 2.0, 2), " - Pоткл (вероятность отказа, т.е. того, что программа будет не обработанной)");
+    emit send(QString::number(tempDiscardProbability/tempRuns, 2.0, 2), " - Pотк (вероятность отказа, т.е. того, что программа будет не обработанной)");
     emit send(QString::number(tempAvgServerBusy/tempRuns), " - K (среднее число занятых серверов)");
     emit send(QString::number(tempAvgProgrammsInSystem/tempRuns, 2.0, 2), " - Nпрог (среднее число программ в ВС)");
     emit send(QString::number(tempAverageTimeInSystem/tempRuns, 2.0, 2), " сек - Tпрог (среднее время нахождения программы в ВС)");
     emit send(QString::number(tempAvgProgrammsInBuffer/tempRuns, 2.0, 2), " - Nбуф (среднее число программ в буфере)");
     emit send(QString::number(tempAverageTimeInBuffer/tempRuns, 2.0, 2), " сек - Tбуф (среднее время нахождения программы в буфере)");
+    currTime = QTime::currentTime();
+    emit send("Время завершения обработки задачи : ", currTime.toString("hh:mm:ss"));
+    emit send("-------------------------------------------------------------","------------------------------------------");
     emit send("","");
+
+    emit finished();
 }
 
 double OutThread::countPercents(double total, double value)

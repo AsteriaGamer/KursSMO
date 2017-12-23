@@ -18,6 +18,9 @@ public:
 public slots:
 	void RunAndShow();
     void UpdateS(QString, QString);
+    void saveFile();
+    void clearEdit();
+    void barMove(int);
 private:
     Ui::MainWindow *ui;
 };

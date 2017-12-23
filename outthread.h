@@ -26,6 +26,8 @@ public slots:
     void doWork();
 signals:
     void send(QString, QString);
+    void finished();
+    void sendBarStatus(int);
 };
 
 #endif // OUTTHREAD_H

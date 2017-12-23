@@ -19,7 +19,7 @@ ComputingSystemStatistics ComputingSystem::Simulate(DistributionType distributio
     QList<ServerProgramm> finishedProgramms;
 
     double timeTillNextProgrammLinear = 0;
-    auto popupProbabilityExp = GetExpProbability(ConstObj.ExpLambda, ConstObj.SimulationStep);
+    double popupProbabilityExp = GetExpProbability(ConstObj.ExpLambda, ConstObj.SimulationStep);
 
     for (double i = 0; i <= ConstObj.SimulationTime; i += ConstObj.SimulationStep){
 
